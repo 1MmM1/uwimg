@@ -82,9 +82,73 @@ float three_way_min(float a, float b, float c)
 void rgb_to_hsv(image im)
 {
     // TODO Fill this in
+    assert(im.c == 3);
+    for (int i = 0; i < im.w; i++) {
+        for (int j = 0; j < im.h; j++) {
+            float red = get_pixel(im, i, j, 0);
+            float green = get_pixel(im, i, j, 1);
+            float blue = get_pixel(im, i, j, 2);
+            float value = three_way_max(red, green, blue);
+            float C = value - three_way_min(red, green, blue);
+            float saturation = value == 0 ? 0 : C / value;
+            float hue = -INFINITY;
+            if (C == 0) {
+                hue = 0;
+            } else if (value == red) {
+                hue = (green - blue) / C;
+            } else if (value == green) {
+                hue = (blue - red) / C + 2;
+            } else if (value == blue) {
+                hue = (red - green) / C + 4;
+            } else {
+                // Should never get here
+                printf("Something went wrong converting RGB to HSV");
+            }
+
+            hue = hue / 6 + (hue < 0 ? 1 : 0);
+            set_pixel(im, i, j, 0, hue);
+            set_pixel(im, i, j, 1, saturation);
+            set_pixel(im, i, j, 2, value);
+        }
+    }
 }
 
 void hsv_to_rgb(image im)
 {
     // TODO Fill this in
+    assert(im.c == 3);
+    for (int i = 0; i < im.w; i++) {
+        for (int j = 0; j < im.h; j++) {
+            float hue = get_pixel(im, i, j, 0) * 6;
+            float saturation = get_pixel(im, i, j, 1);
+            float value = get_pixel(im, i, j, 2);
+            float C = saturation * value;
+            float m = value - C;
+            float red, green, blue;
+            if (hue >= 5) {
+                hue -= 6;
+            }
+            if (hue >= -1 && hue < 1) {
+                red = value;
+                green = m + (hue < 0 ? 0 : hue * C); 
+                blue = m - (hue < 0 ? hue * C : 0);
+            } else if (hue >= 1 && hue < 3) {
+                red = m - ((hue - 2) < 0 ? (hue - 2) * C : 0);
+                green = value;
+                blue = m + ((hue - 2) < 0 ? 0 : (hue - 2) * C);
+            } else if (hue >= 3 && hue < 5) {
+                red = m + ((hue - 4) < 0 ? 0 : (hue - 4) * C);
+                green = m - ((hue - 4) < 0 ? (hue - 4) * C : 0);
+                blue = value;
+            } else {
+                // Should never get here
+                red = green = blue = -INFINITY;
+                printf("Something went wrong converting HSV to RGB");
+            }
+
+            set_pixel(im, i, j, 0, red);
+            set_pixel(im, i, j, 1, green);
+            set_pixel(im, i, j, 2, blue);
+        }
+    }
 }
