@@ -126,30 +126,39 @@ void hsv_to_rgb(image im)
             float C = saturation * value;
             float m = value - C;
             float red, green, blue;
-            if (hue >= 5) {
-                hue -= 6;
-            }
-            if (hue >= -1 && hue < 1) {
-                red = value;
-                green = m + (hue < 0 ? 0 : hue * C); 
-                blue = m - (hue < 0 ? hue * C : 0);
-            } else if (hue >= 1 && hue < 3) {
-                red = m - ((hue - 2) < 0 ? (hue - 2) * C : 0);
-                green = value;
-                blue = m + ((hue - 2) < 0 ? 0 : (hue - 2) * C);
-            } else if (hue >= 3 && hue < 5) {
-                red = m + ((hue - 4) < 0 ? 0 : (hue - 4) * C);
-                green = m - ((hue - 4) < 0 ? (hue - 4) * C : 0);
-                blue = value;
+            float X = C * (1 - fabs(fmod(hue, 2) - 1));
+            if (0 <= hue && hue <= 1) {
+                red = C;
+                green = X;
+                blue = 0;
+            } else if (1 < hue && hue <= 2) {
+                red = X;
+                green = C;
+                blue = 0;
+            } else if (2 < hue && hue <= 3) {
+                red = 0;
+                green = C;
+                blue = X;
+            } else if (3 < hue && hue <= 4) {
+                red = 0;
+                green = X;
+                blue = C;
+            } else if (4 < hue && hue <= 5) {
+                red = X;
+                green = 0;
+                blue = C;
+            } else if (5 < hue && hue <= 6) {
+                red = C;
+                green = 0;
+                blue = X;
             } else {
-                // Should never get here
                 red = green = blue = -INFINITY;
                 printf("Something went wrong converting HSV to RGB");
             }
 
-            set_pixel(im, i, j, 0, red);
-            set_pixel(im, i, j, 1, green);
-            set_pixel(im, i, j, 2, blue);
+            set_pixel(im, i, j, 0, red + m);
+            set_pixel(im, i, j, 1, green + m);
+            set_pixel(im, i, j, 2, blue + m);
         }
     }
 }
