@@ -46,6 +46,7 @@ image rgb_to_grayscale(image im)
 void shift_image(image im, int c, float v)
 {
     // TODO Fill this in
+    assert(c >= 0 && c < im.c);
     for (int i = 0; i < im.w; i++) {
         for (int j = 0; j < im.h; j++) {
             float shifted = get_pixel(im, i, j, c) + v;
@@ -149,6 +150,17 @@ void hsv_to_rgb(image im)
             set_pixel(im, i, j, 0, red);
             set_pixel(im, i, j, 1, green);
             set_pixel(im, i, j, 2, blue);
+        }
+    }
+}
+
+void scale_image(image im, int c, float v) 
+{
+    assert(im.c == 3);
+    assert(c >= 0 && c < im.c);
+    for (int i = 0; i < im.w; i++) {
+        for (int j = 0; j < im.h; j++) {
+            set_pixel(im, i, j, c, get_pixel(im, i, j, c) * v);
         }
     }
 }
