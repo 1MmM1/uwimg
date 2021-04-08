@@ -11,10 +11,10 @@ image nn_resize(image im, int w, int h)
 {
     // TODO Fill in (also fix that first line)
     image resized = make_image(w, h, im.c);
-    float x_scale = im.w / resized.w;
-    float y_scale = im.h / resized.h;
-    float x_start = -fabs(im.w - resized.w) / 2;
-    float y_start = -fabs(im.h - resized.h) / 2;
+    float x_scale = 1.0 * im.w / resized.w;
+    float y_scale = 1.0 * im.h / resized.h;
+    float x_start = -0.5 + x_scale / 2;
+    float y_start = -0.5 + y_scale / 2;
     for (int i = 0; i < resized.w; i++) {
         for (int j = 0; j < resized.h; j++) {
             for (int k = 0; k < resized.c; k++) {
