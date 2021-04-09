@@ -173,3 +173,154 @@ void scale_image(image im, int c, float v)
         }
     }
 }
+
+// Source: https://www.easyrgb.com/en/math.php
+void rgb_to_hcl(image im) {
+    float red, green, blue;
+    float var_R, var_G, var_B;
+    float var_U, var_V, var_Y;
+    float X, Y, Z;
+    float L, u, v;
+    float ref_U, ref_V;
+    float h, C, s;
+    // Illuminants for equal energy (CIE 1931)
+    float ref_x = 100, ref_y = 100, ref_z = 100; 
+    for (int i = 0; i < im.w; i++) {
+        for (int j = 0; j < im.h; j++) {
+            red = get_pixel(im, i, j, 0);
+            green = get_pixel(im, i, j, 1);
+            blue = get_pixel(im, i, j, 2);
+
+            // RGB to XYZ
+            if (red > 0.04045) {
+                var_R = pow(((red + 0.055) / 1.055), 2.4);
+            }
+            else {
+                var_R = red / 12.92;
+            }
+            if (green > 0.04045) {
+                var_G = pow(((green + 0.055) / 1.055), 2.4);
+            }
+            else {
+                var_G = green / 12.92;
+            }
+            if (blue > 0.04045) {
+                var_B = pow(((blue + 0.055) / 1.055), 2.4);
+            }
+            else {
+                var_B = blue / 12.92;
+            }
+
+            var_R = var_R * 100;
+            var_G = var_G * 100;
+            var_B = var_B * 100;
+
+            X = var_R * 0.4124 + var_G * 0.3576 + var_B * 0.1805;
+            Y = var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722;
+            Z = var_R * 0.0193 + var_G * 0.1192 + var_B * 0.9505;
+
+            // XYZ to CIELUV
+            var_U = (4 * X) / (X + (15 * Y) + (3 * Z));
+            var_V = (9 * Y) / (X + (15 * Y) + (3 * Z));
+
+            var_Y = Y / 100;
+            if (var_Y > 0.008856) {
+                var_Y = pow(var_Y, 1.0/3);
+            }
+            else {
+                var_Y = (7.787 * var_Y) + (16.0 / 116);
+            }
+
+            ref_U = (4 * ref_x) / (ref_x + (15 * ref_y) + (3 * ref_z));
+            ref_V = (9 * ref_y) / (ref_x + (15 * ref_y) + (3 * ref_z));
+
+            L = (116 * var_Y) - 16;
+            u = 13 * L * (var_U - ref_U);
+            v = 13 * L * ( var_V - ref_V);
+
+            // CIELUV to HCL
+            h = atan2(v, u);
+            C = sqrt(pow(u, 2) + pow(v, 2));
+            s = 13 * sqrt(pow(u - ref_x, 2) + pow(v - ref_y, 2));
+
+            set_pixel(im, i, j, 0, h);
+            set_pixel(im, i, j, 1, C);
+            set_pixel(im, i, j, 2, s);
+        }
+    }
+}
+
+// Source: https://www.easyrgb.com/en/math.php
+void hcl_to_rgb(image im) {
+    float red, green, blue;
+    float var_U, var_V, var_Y;
+    float X, Y, Z;
+    float L, u, v;
+    float ref_U, ref_V;
+    float h, C, s;
+    // Illuminants for equal energy (CIE 1931)
+    float ref_x = 100, ref_y = 100, ref_z = 100; 
+    for (int i = 0; i < im.w; i++) {
+        for (int j = 0; j < im.h; j++) {
+            h = get_pixel(im, i, j, 0);
+            C = get_pixel(im, i, j, 1);
+            s = get_pixel(im, i, j, 2);
+
+            // HCL to CIELUV
+            u = C * cos(h);
+            v = C * sin(h);
+            L = C / s;
+
+            // CIELUV to XYZ
+            var_Y = (L + 16) /116;
+            if (pow(var_Y, 3)  > 0.008856) {
+                var_Y = pow(var_Y, 3);
+            }
+            else {
+                var_Y = (var_Y - 16 / 116) / 7.787;
+            }
+
+            ref_U = (4 * ref_x) / (ref_x + (15 * ref_y) + (3 * ref_z));
+            ref_V = (9 * ref_y) / (ref_x + (15 * ref_y) + (3 * ref_z));
+
+            var_U = u / (13 * L) + ref_U;
+            var_V = v / (13 * L) + ref_V;
+
+            Y = var_Y * 100;
+            X =  -(9 * Y * var_U) / ((var_U - 4) * var_V - var_U * var_V);
+            Z = (9 * Y - (15 * var_V * Y) - (var_V * X)) / (3 * var_V);
+
+            // XYZ to RGB
+            X = X / 100;
+            Y = Y / 100;
+            Y = Z / 100;
+
+            red = X *  3.2406 + Y * -1.5372 + Z * -0.4986;
+            green = X * -0.9689 + Y *  1.8758 + Z *  0.0415;
+            blue = X *  0.0557 + Y * -0.2040 + Z *  1.0570;
+
+            if ( red > 0.0031308 ) {
+                red = 1.055 * ( pow(red, 1 / 2.4 ) ) - 0.055;
+            }
+            else {
+                red = 12.92 * red;
+            }
+            if ( green > 0.0031308 ) {
+                green = 1.055 * ( pow(green, 1 / 2.4 ) ) - 0.055;
+            }
+            else {
+                green = 12.92 * green;
+            }
+            if ( blue > 0.0031308 ) {
+                blue = 1.055 * ( pow(blue, 1 / 2.4 ) ) - 0.055;
+            }
+            else {
+                blue = 12.92 * blue;
+            }
+            
+            set_pixel(im, i, j, 0, red);
+            set_pixel(im, i, j, 1, green);
+            set_pixel(im, i, j, 2, blue);
+        }
+    }
+}
