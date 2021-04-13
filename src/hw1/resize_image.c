@@ -32,11 +32,9 @@ float bilinear_interpolate(image im, float x, float y, int c)
     float bottom = ceil(y);
     float left = floor(x);
     float right = ceil(x);
-    float vertMid = top + (bottom - top) / 2;
-    float horzMid = left + (right - left) / 2;
-    float q1 = (bottom - vertMid) * get_pixel(im, left, top, c) + (vertMid - top) * get_pixel(im, left, bottom, c);
-    float q2 = (bottom - vertMid) * get_pixel(im, right, top, c) + (vertMid - top) * get_pixel(im, right, bottom, c);
-    return (right - horzMid) * q1 + (horzMid - left) * q2;
+    float q1 = (bottom - y) * get_pixel(im, left, top, c) + (y - top) * get_pixel(im, left, bottom, c);
+    float q2 = (bottom - y) * get_pixel(im, right, top, c) + (y - top) * get_pixel(im, right, bottom, c);
+    return (right - x) * q1 + (x - left) * q2;
 }
 
 image bilinear_resize(image im, int w, int h)
