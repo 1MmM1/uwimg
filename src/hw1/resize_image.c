@@ -28,7 +28,15 @@ image nn_resize(image im, int w, int h)
 float bilinear_interpolate(image im, float x, float y, int c)
 {
     // TODO
-    return 0;
+    float top = floor(y);
+    float bottom = ceil(y);
+    float left = floor(x);
+    float right = ceil(x);
+    float vertMid = top + (bottom - top) / 2;
+    float horzMid = left + (right - left) / 2;
+    float q1 = (bottom - vertMid) * get_pixel(im, left, top, c) + (vertMid - top) * get_pixel(im, left, bottom, c);
+    float q2 = (bottom - vertMid) * get_pixel(im, right, top, c) + (vertMid - top) * get_pixel(im, right, bottom, c);
+    return (right - horzMid) * q1 + (horzMid - left) * q2;
 }
 
 image bilinear_resize(image im, int w, int h)
@@ -36,4 +44,3 @@ image bilinear_resize(image im, int w, int h)
     // TODO
     return make_image(1,1,1);
 }
-
