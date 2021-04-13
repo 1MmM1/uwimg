@@ -40,5 +40,17 @@ float bilinear_interpolate(image im, float x, float y, int c)
 image bilinear_resize(image im, int w, int h)
 {
     // TODO
-    return make_image(1,1,1);
+    image resized = make_image(w, h, im.c);
+    float x_scale = 1.0 * im.w / resized.w;
+    float y_scale = 1.0 * im.h / resized.h;
+    float x_start = -0.5 + x_scale / 2;
+    float y_start = -0.5 + y_scale / 2;
+    for (int i = 0; i < resized.w; i++) {
+        for (int j = 0; j < resized.h; j++) {
+            for (int k = 0; k < resized.c; k++) {
+                set_pixel(resized, i, j, k, bilinear_interpolate(im, x_start + i * x_scale, y_start + j * y_scale, k));
+            }
+        }
+    }
+    return resized;
 }
