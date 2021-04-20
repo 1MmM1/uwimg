@@ -32,9 +32,10 @@ image make_box_filter(int w)
     image im = make_image(w, w, 1);
     for (int i = 0; i < im.w; i++) {
         for (int j = 0; j < im.h; j++) {
-            set_pixel(im, i, j, 0, 1.0 / w);
+            set_pixel(im, i, j, 0, 1);
         }
     }
+    l1_normalize(im);
     return im;
 }
 
