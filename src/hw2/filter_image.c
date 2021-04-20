@@ -10,6 +10,8 @@ void l1_normalize(image im)
 {
     // TODO
     float sum = 0;
+
+    // find sum
     for (int i = 0; i < im.w; i++) {
         for (int j = 0; j < im.h; j++) {
             for (int k = 0; k < im.c; k++) {
@@ -17,6 +19,8 @@ void l1_normalize(image im)
             }
         }
     }
+
+    // normalize
     for (int i = 0; i < im.w; i++) {
         for (int j = 0; j < im.h; j++) {
             for (int k = 0; k < im.c; k++) {
@@ -30,6 +34,8 @@ image make_box_filter(int w)
 {
     // TODO
     image im = make_image(w, w, 1);
+    
+    // fill image with ones
     for (int i = 0; i < im.w; i++) {
         for (int j = 0; j < im.h; j++) {
             set_pixel(im, i, j, 0, 1);
@@ -43,13 +49,14 @@ image convolve_image(image im, image filter, int preserve)
 {
     // TODO
     assert(filter.c == 1 || filter.c == im.c);
+
     image result = make_image(1,1,1);
     if (filter.c == im.c && preserve != 1) {
+        // apply filter 1:1 to image and sum across all channels; produce 1 channel image
         result = make_image(im.w, im.h, 1);
         for (int i = 0; i < im.w; i++) {
             for (int j = 0; j < im.h; j++) {
-                // apply filter 1:1 to image and sum all channels
-                int sum = 0;
+                float sum = 0;
                 for (int q = 0; q < filter.w; q++) {
                     for (int r = 0; r < filter.h; r++) {
                         for (int s = 0; s < filter.c; s++) {
@@ -61,12 +68,12 @@ image convolve_image(image im, image filter, int preserve)
             }
         }
     } else if (filter.c == im.c && preserve == 1) {
+        // apply filter 1:1 to image; produce im.c channel image
         result = make_image(im.w, im.h, im.c);
         for (int i = 0; i < im.w; i++) {
             for (int j = 0; j < im.h; j++) {
                 for (int k = 0; k < im.c; k++) {
-                    // apply filter 1:1 to image and each channel individually
-                    int sum = 0;
+                    float sum = 0;
                     for (int q = 0; q < filter.w; q++) {
                         for (int r = 0; r < filter.h; r++) {
                             sum += get_pixel(filter, q, r, k) * get_pixel(im, i - filter.w / 2 + q, j - filter.h / 2 + r, k);
@@ -76,11 +83,35 @@ image convolve_image(image im, image filter, int preserve)
                 }
             }
         }
-    } else if (filter.c == 1) {
+    } else if (filter.c == 1 && preserve != 1) {
+        // apply filter to each channel individually and sum across channels; produce 1 channel image
+        result = make_image(im.w, im.h, 1);
+        for (int i = 0; i < im.w; i++) {
+            for (int j = 0; j < im.h; j++) {
+                float sum = 0;
+                for (int k = 0; k < im.c; k++) {
+                    for (int q = 0; q < filter.w; q++) {
+                        for (int r = 0; r < filter.h; r++) {
+                            sum += get_pixel(filter, q, r, 0) * get_pixel(im, i - filter.w / 2 + q, j - filter.h / 2 + r, k);
+                        }
+                    }
+                }
+                set_pixel(result, i, j, 0, sum);
+            }
+        }
+    } else if (filter.c == 1 && preserve == 1) {
+        // apply filter to each channel individually; produce im.c channel image
+        result = make_image(im.w, im.h, im.c);
         for (int i = 0; i < im.w; i++) {
             for (int j = 0; j < im.h; j++) {
                 for (int k = 0; k < im.c; k++) {
-                    
+                    float sum = 0;
+                    for (int q = 0; q < filter.w; q++) {
+                        for (int r = 0; r < filter.h; r++) {
+                            sum += get_pixel(filter, q, r, 0) * get_pixel(im, i - filter.w / 2 + q, j - filter.h / 2 + r, k);
+                        }
+                    }
+                    set_pixel(result, i, j, k, sum);
                 }
             }
         }
