@@ -7,7 +7,6 @@
 
 void l1_normalize(image im)
 {
-    // TODO
     float sum = 0;
 
     // find sum
@@ -31,7 +30,6 @@ void l1_normalize(image im)
 
 image make_box_filter(int w)
 {
-    // TODO
     image im = make_image(w, w, 1);
 
     // fill image with ones
@@ -46,7 +44,6 @@ image make_box_filter(int w)
 
 image convolve_image(image im, image filter, int preserve)
 {
-    // TODO
     assert(filter.c == 1 || filter.c == im.c);
 
     image result = make_image(1,1,1);
@@ -123,7 +120,6 @@ image convolve_image(image im, image filter, int preserve)
 
 image make_highpass_filter()
 {
-    // TODO
     image filter = make_image(3,3,1);
     for (int i = 0; i < filter.w * filter.h; i++) {
         filter.data[i] = i % 2 == 0 ? 0 : -1;
@@ -134,7 +130,6 @@ image make_highpass_filter()
 
 image make_sharpen_filter()
 {
-    // TODO
     image filter = make_image(3,3,1);
     for (int i = 0; i < filter.w * filter.h; i++) {
         filter.data[i] = i % 2 == 0 ? 0 : -1;
@@ -145,7 +140,6 @@ image make_sharpen_filter()
 
 image make_emboss_filter()
 {
-    // TODO
     image filter = make_image(3,3,1);
     set_pixel(filter, 0, 0, 0, -2);
     set_pixel(filter, 0, 1, 0, -1);
@@ -161,9 +155,11 @@ image make_emboss_filter()
 
 // Question 2.2.1: Which of these filters should we use preserve when we run our convolution and which ones should we not? Why?
 // Answer: TODO
+// highpass: no preserve. want to find edges.
+// sharpen, emboss: preserve. want an rgb image.
 
 // Question 2.2.2: Do we have to do any post-processing for the above filters? Which ones and why?
-// Answer: TODO
+// Answer: TODO. overflow/underflow
 
 image make_gaussian_filter(float sigma)
 {
@@ -173,7 +169,7 @@ image make_gaussian_filter(float sigma)
     image filter = make_image(size, size, 1);
     for (int i = 0; i < filter.w; i++) {
         for (int j = 0; j < filter.h; j++) {
-            float G = pow(M_E, -(i * i + j * j) / (2 * sigma * sigma)) / (TWOPI * sigma * sigma);
+            float G = pow(M_E, -1.0 * (i * i + j * j) / (2 * sigma * sigma)) / (2 * M_PI * sigma * sigma);
             set_pixel(filter, i, j, 0, G);
         }
     }
@@ -184,13 +180,39 @@ image make_gaussian_filter(float sigma)
 image add_image(image a, image b)
 {
     // TODO
-    return make_image(1,1,1);
+    assert(a.w == b.w && a.h == b.h && a.c == b.c);
+
+    image sum_image = make_image(a.w, a.h, a.c);
+
+    for (int i = 0; i < a.w; i++) {
+        for (int j = 0; j < a.h; j++) {
+            for (int k = 0; k < a.c; k++) {
+                set_pixel(sum_image, i, j, k, get_pixel(a, i, j, k) + get_pixel(b, i, j, k));
+            }
+        }
+    }
+
+    return sum_image;
 }
 
 image sub_image(image a, image b)
 {
     // TODO
-    return make_image(1,1,1);
+    // Subtract b from a
+
+    assert(a.w == b.w && a.h == b.h && a.c == b.c);
+
+    image sub_image = make_image(a.w, a.h, a.c);
+
+    for (int i = 0; i < a.w; i++) {
+        for (int j = 0; j < a.h; j++) {
+            for (int k = 0; k < a.c; k++) {
+                set_pixel(sub_image, i, j, k, get_pixel(a, i, j, k) - get_pixel(b, i, j, k));
+            }
+        }
+    }
+
+    return sub_image;
 }
 
 image make_gx_filter()
