@@ -4,7 +4,6 @@
 #include <math.h>
 #include <assert.h>
 #include "image.h"
-#define TWOPI 6.2831853
 
 void l1_normalize(image im)
 {
@@ -169,7 +168,17 @@ image make_emboss_filter()
 image make_gaussian_filter(float sigma)
 {
     // TODO
-    return make_image(1,1,1);
+    int size = ceil(sigma * 6);
+    size = size % 2 == 0 ? size + 1 : size;
+    image filter = make_image(size, size, 1);
+    for (int i = 0; i < filter.w; i++) {
+        for (int j = 0; j < filter.h; j++) {
+            float G = pow(M_E, -(i * i + j * j) / (2 * sigma * sigma)) / (TWOPI * sigma * sigma);
+            set_pixel(filter, i, j, 0, G);
+        }
+    }
+    l1_normalize(filter);
+    return filter;
 }
 
 image add_image(image a, image b)
