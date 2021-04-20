@@ -249,18 +249,19 @@ image make_gy_filter()
 void feature_normalize(image im)
 {
     // TODO
-    // If the range is zero we should just set the whole image to zero
-
     // Find minimum and range
-    float min = 1;
-    float max = 0;
+    if (im.w == 0 && im.h == 0 && im.w == 0) return;
+
+    float min = get_pixel(im, 0, 0, 0);
+    float max = get_pixel(im, 0, 0, 0);
     for (int i = 0; i < im.w; i++) {
         for (int j = 0; j < im.h; j++) {
             for (int k = 0; k < im.c; k++) {
                 float pixel = get_pixel(im, i, j, k);
                 if (pixel < min) {
                     min = pixel;
-                } else if (pixel > max) {
+                }
+                if (pixel > max) {
                     max = pixel;
                 }
             }
@@ -285,14 +286,14 @@ image *sobel_image(image im)
 {
     // TODO
     image* res = calloc(2, sizeof(image));
-    res->w = im.w;
-    res->h = im.h;
-    res->c = im.c;
-    res->data = calloc(im.w * im.h * im.c, sizeof(float));
-    ((image*) (res + sizeof(image)))->w = im.w;
-    ((image*) (res + sizeof(image)))->h = im.h;
-    ((image*) (res + sizeof(image)))->c = im.c;
-    ((image*) (res + sizeof(image)))->data = calloc(im.w * im.h * im.c, sizeof(float));
+    res[0].w = im.w;
+    res[0].h = im.h;
+    res[0].c = im.c;
+    res[0].data = calloc(im.w * im.h * im.c, sizeof(float));
+    res[1].w = im.w;
+    res[1].h = im.h;
+    res[1].c = im.c;
+    res[1].data = calloc(im.w * im.h * im.c, sizeof(float));
 
 
     image gx_filter = make_gx_filter();
@@ -308,8 +309,8 @@ image *sobel_image(image im)
                 float gy = get_pixel(gy_convolution, i, j, k);
                 float magnitude = sqrt(gx * gx + gy * gy);
                 float direction = atan(gy / gx);
-                set_pixel(*res, i, j, k, magnitude);
-                set_pixel(*((image*) (res + sizeof(image))), i, j, k, direction);
+                set_pixel(res[0], i, j, k, magnitude);
+                set_pixel(res[1], i, j, k, direction);
             }
         }
     }
