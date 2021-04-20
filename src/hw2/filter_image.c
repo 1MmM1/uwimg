@@ -169,7 +169,9 @@ image make_gaussian_filter(float sigma)
     image filter = make_image(size, size, 1);
     for (int i = 0; i < filter.w; i++) {
         for (int j = 0; j < filter.h; j++) {
-            float G = exp(-0.5 * (i * i + j * j) / (sigma * sigma)) / (TWOPI * sigma * sigma);
+            float x = size / 2 - i; // x-distance from pixel (i,j,0) to the center of the filter
+            float y = size / 2 - j; // y-distance from pixel (i,j,0) to the center of the filter
+            float G = exp(-0.5 * (x * x + y * y) / (sigma * sigma)) / (TWOPI * sigma * sigma);
             set_pixel(filter, i, j, 0, G);
         }
     }
