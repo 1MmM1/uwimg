@@ -12,8 +12,8 @@ def optimize_for_display(image):
     for i in range(image.w):
         for j in range(image.h):
             for k in range(image.c):
-                val = min(max(0, get_pixel(image, i, j, k)), 1);
-                set_pixel(image, i, j, k, val);
+               val = min(max(0, get_pixel(image, i, j, k)), 1)
+               set_pixel(image, i, j, k, val)
 
 # Use highpass filter
 f = make_highpass_filter()
@@ -37,3 +37,20 @@ save_image(emboss, "dog-emboss")
 f = make_gaussian_filter(2)
 blur = convolve_image(im, f, 1)
 save_image(blur, "dog-gauss2")
+
+# Dog reconstruction
+f = make_gaussian_filter(2)
+lfreq = convolve_image(im, f, 1)
+hfreq = im - lfreq
+reconstruct = lfreq + hfreq
+save_image(lfreq, "low-frequency")
+save_image(hfreq, "high-frequency")
+save_image(reconstruct, "reconstruct")
+
+# Ronbledore 
+
+# Sobel image
+res = sobel_image(im)
+mag = res[0]
+feature_normalize(mag)
+save_image(mag, "magnitude")
