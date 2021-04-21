@@ -258,12 +258,8 @@ void feature_normalize(image im)
         for (int j = 0; j < im.h; j++) {
             for (int k = 0; k < im.c; k++) {
                 float pixel = get_pixel(im, i, j, k);
-                if (pixel < min) {
-                    min = pixel;
-                }
-                if (pixel > max) {
-                    max = pixel;
-                }
+                min = MIN(pixel, min);
+                max = MAX(pixel, max);
             }
         }
     }
@@ -286,35 +282,25 @@ image *sobel_image(image im)
 {
     // TODO
     image* res = calloc(2, sizeof(image));
-    res[0].w = im.w;
-    res[0].h = im.h;
-    res[0].c = im.c;
-    res[0].data = calloc(im.w * im.h * im.c, sizeof(float));
-    res[1].w = im.w;
-    res[1].h = im.h;
-    res[1].c = im.c;
-    res[1].data = calloc(im.w * im.h * im.c, sizeof(float));
-
+    res[0] = make_image(im.w, im.h, 1);
+    res[1] = make_image(im.w, im.h, 1);
 
     image gx_filter = make_gx_filter();
     image gy_filter = make_gy_filter();
 
-    image gx_convolution = convolve_image(im, gx_filter, 1);
-    image gy_convolution = convolve_image(im, gy_filter, 1);
+    image gx_convolution = convolve_image(im, gx_filter, 0);
+    image gy_convolution = convolve_image(im, gy_filter, 0);
 
     for (int i = 0; i < im.w; i++) {
         for (int j = 0; j < im.h; j++) {
-            for (int k = 0; k < im.c; k++) {
-                float gx = get_pixel(gx_convolution, i, j, k);
-                float gy = get_pixel(gy_convolution, i, j, k);
-                float magnitude = sqrt(gx * gx + gy * gy);
-                float direction = atan(gy / gx);
-                set_pixel(res[0], i, j, k, magnitude);
-                set_pixel(res[1], i, j, k, direction);
-            }
+            float gx = get_pixel(gx_convolution, i, j, 0);
+            float gy = get_pixel(gy_convolution, i, j, 0);
+            float magnitude = sqrt(gx * gx + gy * gy);
+            float direction = atan(gy / gx);
+            set_pixel(res[0], i, j, 0, magnitude);
+            set_pixel(res[1], i, j, 0, direction);
         }
     }
-
     return res;
 }
 
