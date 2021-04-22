@@ -58,3 +58,8 @@ save_image(mag, "magnitude")
 direction = res[1]
 feature_normalize(direction)
 save_image(direction, "direction")
+
+# Colorized sobel
+color_sobel = colorize_sobel(im)
+optimize_for_display(color_sobel)
+save_image(color_sobel, "dog-colorize-sobel")

@@ -198,7 +198,6 @@ image add_image(image a, image b)
 image sub_image(image a, image b)
 {
     // Subtract b from a
-
     assert(a.w == b.w && a.h == b.h && a.c == b.c);
 
     image sub_image = make_image(a.w, a.h, a.c);
@@ -303,5 +302,29 @@ image *sobel_image(image im)
 image colorize_sobel(image im)
 {
     // TODO
-    return make_image(1,1,1);
+    image blurred = copy_image(im);
+    image guassian_blur = make_gaussian_filter(3);
+
+    // Blur image
+    blurred = convolve_image(blurred, guassian_blur, 1);
+
+    image *sobel = sobel_image(blurred);
+    image colorized = make_image(blurred.w, blurred.h, blurred.c);
+
+    // Normalize sobel result
+    feature_normalize(sobel[0]);
+    feature_normalize(sobel[1]);
+
+    // Construct colorized image
+    for (int i = 0; i < blurred.w; i++) {
+        for (int j = 0; j < blurred.h; j++) {
+            // Use angle to specify hue
+            set_pixel(colorized, i, j, 0, get_pixel(sobel[1], i, j, 0));
+            // Use magnitude to specify saturation and value
+            set_pixel(colorized, i, j, 1, get_pixel(sobel[0], i, j, 0));
+            set_pixel(colorized, i, j, 2, get_pixel(sobel[0], i, j, 0));
+        }
+    }
+    hsv_to_rgb(colorized);
+    return colorized;
 }
