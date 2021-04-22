@@ -47,7 +47,7 @@ save_image(lfreq, "low-frequency")
 save_image(hfreq, "high-frequency")
 save_image(reconstruct, "reconstruct")
 
-# Ronbledore 
+# Ronbledore
 
 # Sobel image
 res = sobel_image(im)
@@ -57,4 +57,4 @@ save_image(mag, "magnitude")
 
 direction = res[1]
 feature_normalize(direction)
-save_image(mag, "direction")
+save_image(direction, "direction")
