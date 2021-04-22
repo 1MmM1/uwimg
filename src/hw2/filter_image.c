@@ -318,10 +318,10 @@ image colorize_sobel(image im)
     // Construct colorized image
     for (int i = 0; i < blurred.w; i++) {
         for (int j = 0; j < blurred.h; j++) {
-            // Use angle to specify hue
-            set_pixel(colorized, i, j, 0, get_pixel(sobel[1], i, j, 0));
-            // Use magnitude to specify saturation and value
-            set_pixel(colorized, i, j, 1, get_pixel(sobel[0], i, j, 0));
+            // Use angle to specify hue and saturation
+            set_pixel(colorized, i, j, 0, 1 - get_pixel(sobel[1], i, j, 0));
+            set_pixel(colorized, i, j, 1, get_pixel(sobel[1], i, j, 0));
+            // Use magnitude to specify value
             set_pixel(colorized, i, j, 2, get_pixel(sobel[0], i, j, 0));
         }
     }
