@@ -216,7 +216,6 @@ image sub_image(image a, image b)
 
 image make_gx_filter()
 {
-    // TODO
     image filter = make_image(3,3,1);
     set_pixel(filter, 0, 0, 0, -1);
     set_pixel(filter, 0, 1, 0, 0);
@@ -232,7 +231,6 @@ image make_gx_filter()
 
 image make_gy_filter()
 {
-    // TODO
     image filter = make_image(3,3,1);
     set_pixel(filter, 0, 0, 0, -1);
     set_pixel(filter, 0, 1, 0, -2);
@@ -248,7 +246,6 @@ image make_gy_filter()
 
 void feature_normalize(image im)
 {
-    // TODO
     // Find minimum and range
     if (im.w == 0 && im.h == 0 && im.w == 0) return;
 
@@ -280,7 +277,6 @@ void feature_normalize(image im)
 
 image *sobel_image(image im)
 {
-    // TODO
     image* res = calloc(2, sizeof(image));
     res[0] = make_image(im.w, im.h, 1);
     res[1] = make_image(im.w, im.h, 1);
@@ -296,7 +292,7 @@ image *sobel_image(image im)
             float gx = get_pixel(gx_convolution, i, j, 0);
             float gy = get_pixel(gy_convolution, i, j, 0);
             float magnitude = sqrt(gx * gx + gy * gy);
-            float direction = atan(gy / gx);
+            float direction = atan2(gx, gy);
             set_pixel(res[0], i, j, 0, magnitude);
             set_pixel(res[1], i, j, 0, direction);
         }
