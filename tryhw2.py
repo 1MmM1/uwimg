@@ -48,6 +48,14 @@ save_image(hfreq, "high-frequency")
 save_image(reconstruct, "reconstruct")
 
 # Ronbledore
+dumbledore = load_image("data/dumbledore.png")
+ron = load_image("data/ron.png")
+f = make_gaussian_filter(3)
+lowpass = convolve_image(ron, f, 1)
+highpass = sub_image(ron, lowpass)
+ronbledore = add_image(highpass, convolve_image(dumbledore, f, 1))
+optimize_for_display(ronbledore)
+save_image(ronbledore, "ronbledore")
 
 # Sobel image
 res = sobel_image(im)
