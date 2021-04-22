@@ -154,12 +154,16 @@ image make_emboss_filter()
 }
 
 // Question 2.2.1: Which of these filters should we use preserve when we run our convolution and which ones should we not? Why?
-// Answer: TODO
-// highpass: no preserve. want to find edges.
-// sharpen, emboss: preserve. want an rgb image.
+// Answer: It depends on what you want to do, but from what was said in lecture, we would want to use highpass filter for finding 
+// edges so we only need to output one channel and wouldn't need preserve. We would use preserve for sharpen and emboss because 
+// they are meant to change how the image looks to a viewer, so we want to be able to display it in RGB.
 
 // Question 2.2.2: Do we have to do any post-processing for the above filters? Which ones and why?
-// Answer: TODO. overflow/underflow
+// Answer: Again, it depends on what you want to do, but from the examples given in lecture, we would have to do some post 
+// processing for all of the above filters to prevent overflow / underflow. If we did not do post processing, we would get
+// artifacting on the images when the value is out of range (greater than 1 or less than 0). To address this issue, we
+// clamped the values so that all values less than 0 were set to 0 and all values greater than 1 were set to 1, that way
+// all values stored in the image were valid RGB values within our defined range.
 
 image make_gaussian_filter(float sigma)
 {
@@ -301,7 +305,6 @@ image *sobel_image(image im)
 
 image colorize_sobel(image im)
 {
-    // TODO
     image blurred = copy_image(im);
     image guassian_blur = make_gaussian_filter(3);
 
