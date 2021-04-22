@@ -154,12 +154,12 @@ image make_emboss_filter()
 }
 
 // Question 2.2.1: Which of these filters should we use preserve when we run our convolution and which ones should we not? Why?
-// Answer: It depends on what you want to do, but from what was said in lecture, we would want to use highpass filter for finding 
-// edges so we only need to output one channel and wouldn't need preserve. We would use preserve for sharpen and emboss because 
+// Answer: It depends on what you want to do, but from what was said in lecture, we would want to use highpass filter for finding
+// edges so we only need to output one channel and wouldn't need preserve. We would use preserve for sharpen and emboss because
 // they are meant to change how the image looks to a viewer, so we want to be able to display it in RGB.
 
 // Question 2.2.2: Do we have to do any post-processing for the above filters? Which ones and why?
-// Answer: Again, it depends on what you want to do, but from the examples given in lecture, we would have to do some post 
+// Answer: Again, it depends on what you want to do, but from the examples given in lecture, we would have to do some post
 // processing for all of the above filters to prevent overflow / underflow. If we did not do post processing, we would get
 // artifacting on the images when the value is out of range (greater than 1 or less than 0). To address this issue, we
 // clamped the values so that all values less than 0 were set to 0 and all values greater than 1 were set to 1, that way
@@ -221,13 +221,13 @@ image make_gx_filter()
 {
     image filter = make_image(3,3,1);
     set_pixel(filter, 0, 0, 0, -1);
-    set_pixel(filter, 0, 1, 0, 0);
-    set_pixel(filter, 0, 2, 0, 1);
-    set_pixel(filter, 1, 0, 0, -2);
+    set_pixel(filter, 0, 1, 0, -2);
+    set_pixel(filter, 0, 2, 0, -1);
+    set_pixel(filter, 1, 0, 0, 0);
     set_pixel(filter, 1, 1, 0, 0);
-    set_pixel(filter, 1, 2, 0, 2);
-    set_pixel(filter, 2, 0, 0, -1);
-    set_pixel(filter, 2, 1, 0, 0);
+    set_pixel(filter, 1, 2, 0, 0);
+    set_pixel(filter, 2, 0, 0, 1);
+    set_pixel(filter, 2, 1, 0, 2);
     set_pixel(filter, 2, 2, 0, 1);
     return filter;
 }
@@ -236,13 +236,13 @@ image make_gy_filter()
 {
     image filter = make_image(3,3,1);
     set_pixel(filter, 0, 0, 0, -1);
-    set_pixel(filter, 0, 1, 0, -2);
-    set_pixel(filter, 0, 2, 0, -1);
-    set_pixel(filter, 1, 0, 0, 0);
+    set_pixel(filter, 0, 1, 0, 0);
+    set_pixel(filter, 0, 2, 0, 1);
+    set_pixel(filter, 1, 0, 0, -2);
     set_pixel(filter, 1, 1, 0, 0);
-    set_pixel(filter, 1, 2, 0, 0);
-    set_pixel(filter, 2, 0, 0, 1);
-    set_pixel(filter, 2, 1, 0, 2);
+    set_pixel(filter, 1, 2, 0, 2);
+    set_pixel(filter, 2, 0, 0, -1);
+    set_pixel(filter, 2, 1, 0, 0);
     set_pixel(filter, 2, 2, 0, 1);
     return filter;
 }
@@ -295,7 +295,7 @@ image *sobel_image(image im)
             float gx = get_pixel(gx_convolution, i, j, 0);
             float gy = get_pixel(gy_convolution, i, j, 0);
             float magnitude = sqrt(gx * gx + gy * gy);
-            float direction = atan2(gx, gy);
+            float direction = atan2(gy, gx);
             set_pixel(res[0], i, j, 0, magnitude);
             set_pixel(res[1], i, j, 0, direction);
         }
