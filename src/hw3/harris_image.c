@@ -50,7 +50,7 @@ descriptor describe_index(image im, int i)
 
 // Marks the spot of a point in an image.
 // image im: image to mark.
-// ponit p: spot to mark in the image.
+// point p: spot to mark in the image.
 void mark_spot(image im, point p)
 {
     int x = p.x;
@@ -114,6 +114,38 @@ image structure_matrix(image im, float sigma)
 {
     image S = make_image(im.w, im.h, 3);
     // TODO: calculate structure matrix for im.
+
+    // Calculate image derivatives Ix and Iy
+    image gx_filter = make_gx_filter();
+    image gy_filter = make_gy_filter();
+
+    image gx_convolution = convolve_image(im, gx_filter, 0);
+    image gy_convolution = convolve_image(im, gy_filter, 0);
+
+    // Calculate measures IxIx, IyIy, IxIy
+
+    for (int i = 0; i < im.w; i++) {
+        for (int j = 0; j < im.h; j++) {
+            set_pixel(S, i, j, 0, get_pixel(gx_convolution, i, j, 0) * get_pixel(gx_convolution, i, j, 0));
+        }
+    }
+
+    for (int i = 0; i < im.w; i++) {
+        for (int j = 0; j < im.h; j++) {
+            set_pixel(S, i, j, 1, get_pixel(gy_convolution, i, j, 0) * get_pixel(gy_convolution, i, j, 0));
+        }
+    }
+
+    for (int i = 0; i < im.w; i++) {
+        for (int j = 0; j < im.h; j++) {
+            set_pixel(S, i, j, 2, get_pixel(gx_convolution, i, j, 0) * get_pixel(gy_convolution, i, j, 0));
+        }
+    }
+
+    // Calculate structure matrix components as weighted sum of nearby measures
+    image gaussian_filter = make_gaussian_filter(sigma);
+    S = convolve_image(S, gaussian_filter, 1);
+
     return S;
 }
 
@@ -125,10 +157,24 @@ image cornerness_response(image S)
     image R = make_image(S.w, S.h, 1);
     // TODO: fill in R, "cornerness" for each pixel using the structure matrix.
     // We'll use formulation det(S) - alpha * trace(S)^2, alpha = .06.
+
+    for (int i = 0; i < S.w; i++) {
+        for (int j = 0; j < S.h; j++) {
+
+            // ad - bc  [a is IxIx, d is IyIy, b and c are both IxIy]
+            float det = get_pixel(S, i, j, 0) * get_pixel(S, i, j, 1) - get_pixel(S, i, j, 2) * get_pixel(S, i, j, 2);
+
+            // a + d
+            float trace = get_pixel(S, i, j, 0) + get_pixel(S, i, j, 1);
+
+            set_pixel(R, i, j, 0, det - 0.06 * trace * trace);
+        }
+    }
+
     return R;
 }
 
-// Perform non-max supression on an image of feature responses.
+// Perform non-max suppression on an image of feature responses.
 // image im: 1-channel image of feature responses.
 // int w: distance to look for larger responses.
 // returns: image with only local-maxima responses within w pixels.
@@ -140,6 +186,19 @@ image nms_image(image im, int w)
     //     for neighbors within w:
     //         if neighbor response greater than pixel response:
     //             set response to be very low (I use -999999 [why not 0??])
+
+    for (int i = w + 1; i < im.w - w; i++) {
+        for (int j = w + 1; j < im.h - w; j++) {
+            for (int x = i; x < i + 2 * w + 1; x++) {
+                for (int y = j; y < im.h + 2 * w + 1; y++) {
+                    if (get_pixel(im, x, y, 0) > get_pixel(im, i, j, 0)) {
+                        set_pixel(r, i, j, 0, -999999);
+                    }
+                }
+            }
+        }
+    }
+
     return r;
 }
 
@@ -163,13 +222,30 @@ descriptor *harris_corner_detector(image im, float sigma, float thresh, int nms,
 
 
     //TODO: count number of responses over threshold
-    int count = 1; // change this
-
+    int count = 0;
+    for (int i = 0; i < Rnms.w; i++) {
+        for (int j = 0; j < Rnms.h; j++) {
+            if (get_pixel(Rnms, i, j, 0) > thresh) {
+                count++;
+            }
+        }
+    }
     
     *n = count; // <- set *n equal to number of corners in image.
     descriptor *d = calloc(count, sizeof(descriptor));
     //TODO: fill in array *d with descriptors of corners, use describe_index.
 
+    int tally = 0   ;
+    for (int i = 0; i < Rnms.w; i++) {
+        for (int j = 0; j < Rnms.h; j++) {
+            if (get_pixel(Rnms, i, j, 0) > thresh) {
+                // Are all RGB channels necessary? Just using channel 0 here.
+                int idx = 0 * im.h * im.w + j * im.w + i;
+                d[tally] = describe_index(im, idx);
+                tally++;
+            }                
+        }
+    }
 
     free_image(S);
     free_image(R);
