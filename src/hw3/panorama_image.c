@@ -63,8 +63,8 @@ image draw_matches(image a, image b, match *matches, int n, int inliers)
     image both = both_images(a, b);
     int i,j;
     for(i = 0; i < n; ++i){
-        int bx = matches[i].p.x; 
-        int ex = matches[i].q.x; 
+        int bx = matches[i].p.x;
+        int ex = matches[i].q.x;
         int by = matches[i].p.y;
         int ey = matches[i].q.y;
         for(j = bx; j < ex + a.w; ++j){
@@ -120,7 +120,7 @@ float l1_distance(float *a, float *b, int n)
     // TODO: return the correct number.
     float sum = 0;
     for (int i = 0; i < n; i++) {
-        sum += abs(a[i] - b[i]);
+        sum += fabs(a[i] - b[i]);
     }
     return sum;
 }
@@ -165,14 +165,17 @@ match *match_descriptors(descriptor *a, int an, descriptor *b, int bn, int *mn)
     // Some points will not be in a match.
     // In practice just bring good matches to front of list, set *mn.
     qsort(m, an, sizeof(match), match_compare);
-    for (i = 0, j = 1; i < an && j < an; i++) {
+    for (i = 0, j = 0; i < an && j < an; i++) {
         if (seen[m[i].bi] != 1) {
             seen[m[i].bi] = 1;
             count++;
         } else {
-            m[i] = m[j];
-            i--;
-            j++;
+            while (j < an && seen[m[j].bi] == 1) {
+                j++;
+            }
+            if (j < an) {
+                m[i] = m[j];
+            }
         }
     }
     *mn = count;
@@ -249,7 +252,7 @@ matrix compute_homography(match *matches, int n)
 
     }
     matrix a = solve_system(M, b);
-    free_matrix(M); free_matrix(b); 
+    free_matrix(M); free_matrix(b);
 
     // If a solution can't be found, return empty matrix;
     matrix none = {0};
@@ -324,7 +327,7 @@ image combine_images(image a, image b, matrix H)
 
     int i,j,k;
     image c = make_image(w, h, a.c);
-    
+
     // Paste image a into the new image offset by dx and dy.
     for(k = 0; k < a.c; ++k){
         for(j = 0; j < a.h; ++j){
@@ -357,7 +360,7 @@ image panorama_image(image a, image b, float sigma, float thresh, int nms, float
     int an = 0;
     int bn = 0;
     int mn = 0;
-    
+
     // Calculate corners and descriptors
     descriptor *ad = harris_corner_detector(a, sigma, thresh, nms, &an);
     descriptor *bd = harris_corner_detector(b, sigma, thresh, nms, &bn);

@@ -181,7 +181,7 @@ image nms_image(image im, int w)
     for (int i = 0; i < im.w; i++) {
         for (int j = 0; j < im.h; j++) {
             for (int x = i - w; x < i + w; x++) {
-                for (int y = j - w; y < im.h + w; y++) {
+                for (int y = j - w; y < j + w; y++) {
                     if (get_pixel(im, x, y, 0) > get_pixel(im, i, j, 0)) {
                         set_pixel(r, i, j, 0, -999999);
                     }
@@ -221,7 +221,7 @@ descriptor *harris_corner_detector(image im, float sigma, float thresh, int nms,
             }
         }
     }
-    
+
     *n = count; // <- set *n equal to number of corners in image.
     descriptor *d = calloc(count, sizeof(descriptor));
     //TODO: fill in array *d with descriptors of corners, use describe_index.
@@ -234,7 +234,7 @@ descriptor *harris_corner_detector(image im, float sigma, float thresh, int nms,
                 int idx = 0 * im.h * im.w + j * im.w + i;
                 d[tally] = describe_index(im, idx);
                 tally++;
-            }                
+            }
         }
     }
 
