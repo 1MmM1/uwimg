@@ -123,22 +123,13 @@ image structure_matrix(image im, float sigma)
     image gy_convolution = convolve_image(im, gy_filter, 0);
 
     // Calculate measures IxIx, IyIy, IxIy
-
     for (int i = 0; i < im.w; i++) {
         for (int j = 0; j < im.h; j++) {
-            set_pixel(S, i, j, 0, get_pixel(gx_convolution, i, j, 0) * get_pixel(gx_convolution, i, j, 0));
-        }
-    }
-
-    for (int i = 0; i < im.w; i++) {
-        for (int j = 0; j < im.h; j++) {
-            set_pixel(S, i, j, 1, get_pixel(gy_convolution, i, j, 0) * get_pixel(gy_convolution, i, j, 0));
-        }
-    }
-
-    for (int i = 0; i < im.w; i++) {
-        for (int j = 0; j < im.h; j++) {
-            set_pixel(S, i, j, 2, get_pixel(gx_convolution, i, j, 0) * get_pixel(gy_convolution, i, j, 0));
+            float Ix = get_pixel(gx_convolution, i, j, 0);
+            float Iy = get_pixel(gy_convolution, i, j, 0);
+            set_pixel(S, i, j, 0, Ix * Ix);
+            set_pixel(S, i, j, 1, Iy * Iy);
+            set_pixel(S, i, j, 2, Ix * Iy);
         }
     }
 
@@ -187,10 +178,10 @@ image nms_image(image im, int w)
     //         if neighbor response greater than pixel response:
     //             set response to be very low (I use -999999 [why not 0??])
 
-    for (int i = w + 1; i < im.w - w; i++) {
-        for (int j = w + 1; j < im.h - w; j++) {
-            for (int x = i; x < i + 2 * w + 1; x++) {
-                for (int y = j; y < im.h + 2 * w + 1; y++) {
+    for (int i = 0; i < im.w; i++) {
+        for (int j = 0; j < im.h; j++) {
+            for (int x = i - w; x < i + w; x++) {
+                for (int y = j - w; y < im.h + w; y++) {
                     if (get_pixel(im, x, y, 0) > get_pixel(im, i, j, 0)) {
                         set_pixel(r, i, j, 0, -999999);
                     }
