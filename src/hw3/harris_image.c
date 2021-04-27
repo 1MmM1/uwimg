@@ -180,8 +180,8 @@ image nms_image(image im, int w)
 
     for (int i = 0; i < im.w; i++) {
         for (int j = 0; j < im.h; j++) {
-            for (int x = i - w; x < i + w; x++) {
-                for (int y = j - w; y < j + w; y++) {
+            for (int x = i - w; x <= i + w; x++) {
+                for (int y = j - w; y <= j + w; y++) {
                     if (get_pixel(im, x, y, 0) > get_pixel(im, i, j, 0)) {
                         set_pixel(r, i, j, 0, -999999);
                     }
