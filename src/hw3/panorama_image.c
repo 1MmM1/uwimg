@@ -192,7 +192,18 @@ point project_point(matrix H, point p)
     // TODO: project point p with homography H.
     // Remember that homogeneous coordinates are equivalent up to scalar.
     // Have to divide by.... something...
-    point q = make_point(0, 0);
+
+    c.data[0][0] = p.x;
+    c.data[1][0] = p.y;
+    c.data[2][0] = 1.0; // w
+
+    matrix m = matrix_mult_matrix(H, p_matrix);
+
+    // Then do normalization for converting homogeneous -> image coordinates.
+    float px = m.data[0][0] / m.data[2][0];
+    float py = m.data[1][0] / m.data[2][0];
+
+    point q = make_point(px, py);
     return q;
 }
 
@@ -202,7 +213,7 @@ point project_point(matrix H, point p)
 float point_distance(point p, point q)
 {
     // TODO: should be a quick one.
-    return 0;
+    return sqrt((p.x - q.x) * (p.x - q.x) + (p.y - q.y) * (p.y - q.y));
 }
 
 // Count number of inliers in a set of matches. Should also bring inliers
@@ -221,6 +232,23 @@ int model_inliers(matrix H, match *m, int n, float thresh)
     // TODO: count number of matches that are inliers
     // i.e. distance(H*p, q) < thresh
     // Also, sort the matches m so the inliers are the first 'count' elements.
+
+    // Loop over the points
+    for (i = 0; i < n; i++) {
+        // Project the point using the homography.
+        point p = project_point(H, m[i].p);
+        // Check if the point is within thresh distance of actual matching point in the other image.
+        if (point_distance(p, m[i].q) <= thresh) {
+            // If so, bring inlier to the front of the list.
+            count++;
+            match inlier = m[i];
+            for (j = i; j > 0; j--) {
+                m[j] = m[j-1];
+            }
+            m[0] = inlier;
+        }
+    }
+
     return count;
 }
 
@@ -230,6 +258,13 @@ int model_inliers(matrix H, match *m, int n, float thresh)
 void randomize_matches(match *m, int n)
 {
     // TODO: implement Fisher-Yates to shuffle the array.
+    for (int i = 0; i < n - 1; i++) {
+        int j = rand() % (n - i) + i; // random int s.t. i <= j < n [CHECK THIS]
+        // Exchange m[i] and m[j]
+        match temp = m[i];
+        m[i] = m[j];
+        m[j] = temp;
+    }
 }
 
 // Computes homography between two images given matching pixels.
