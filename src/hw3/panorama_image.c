@@ -165,17 +165,16 @@ match *match_descriptors(descriptor *a, int an, descriptor *b, int bn, int *mn)
     // Some points will not be in a match.
     // In practice just bring good matches to front of list, set *mn.
     qsort(m, an, sizeof(match), match_compare);
-    for (i = 0, j = 0; i < an && j < an; i++) {
+    for (i = 0; i < an - count; i++) {
         if (seen[m[i].bi] != 1) {
             seen[m[i].bi] = 1;
             count++;
         } else {
-            while (j < an && seen[m[j].bi] == 1) {
-                j++;
+            // Throw out the match by shifting the other elements forward in the list
+            for (j = i; j < an - 1; j++) {
+                m[j] = m[j+1];
             }
-            if (j < an) {
-                m[i] = m[j];
-            }
+            i--;
         }
     }
     *mn = count;
