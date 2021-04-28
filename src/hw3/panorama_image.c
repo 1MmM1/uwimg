@@ -198,7 +198,7 @@ point project_point(matrix H, point p)
     c.data[1][0] = p.y;
     c.data[2][0] = 1.0; // w
 
-    matrix m = matrix_mult_matrix(H, p_matrix);
+    matrix m = matrix_mult_matrix(H, c);
 
     // Then do normalization for converting homogeneous -> image coordinates.
     float px = m.data[0][0] / m.data[2][0];
@@ -243,7 +243,7 @@ int model_inliers(matrix H, match *m, int n, float thresh)
             // If so, bring inlier to the front of the list.
             count++;
             match inlier = m[i];
-            for (j = i; j > 0; j--) {
+            for (int j = i; j > 0; j--) {
                 m[j] = m[j-1];
             }
             m[0] = inlier;
