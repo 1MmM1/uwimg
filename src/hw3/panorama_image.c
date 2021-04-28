@@ -260,7 +260,7 @@ void randomize_matches(match *m, int n)
 {
     // TODO: implement Fisher-Yates to shuffle the array.
     for (int i = 0; i < n - 1; i++) {
-        int j = rand() % (n - i) + i; // random int s.t. i <= j < n [CHECK THIS]
+        int j = rand() % (n - i) + i; // random int s.t. i <= j < n
         // Exchange m[i] and m[j]
         match temp = m[i];
         m[i] = m[j];
@@ -284,7 +284,24 @@ matrix compute_homography(match *matches, int n)
         double y  = matches[i].p.y;
         double yp = matches[i].q.y;
         // TODO: fill in the matrices M and b.
+        // [x, y, 1, 0, 0, 0, -x*xp, -y*xp]
+        M.data[i * 2][0] = x;
+        M.data[i * 2][1] = y;
+        M.data[i * 2][2] = 1;
+        M.data[i * 2][6] = -x * xp;
+        M.data[i * 2][7] = -y * xp;
 
+        // [0, 0, 0, x, y, 1, -x*yp, -y*yp]
+        M.data[i * 2 + 1][3] = x;
+        M.data[i * 2 + 1][4] = y;
+        M.data[i * 2 + 1][5] = 1;
+        M.data[i * 2 + 1][6] = -x * yp;
+        M.data[i * 2 + 1][7] = -y * yp;
+
+        // [xp]
+        // [yp]
+        b.data[i * 2][0] = xp;
+        b.data[i * 2 + 1][0] = yp;
     }
     matrix a = solve_system(M, b);
     free_matrix(M); free_matrix(b);
@@ -295,7 +312,14 @@ matrix compute_homography(match *matches, int n)
 
     matrix H = make_matrix(3, 3);
     // TODO: fill in the homography H based on the result in a.
-
+    if (M.rows >= 8) {
+        for (i = 0; i < 8; i++) {
+            H.data[i / 3][i % 3] = a.data[i][0];
+        }
+        H.data[2][2] = 1;
+    } else {
+        printf("Something went wrong applying computing the homography: M.rows < 8.");
+    }
 
     free_matrix(a);
     return H;
