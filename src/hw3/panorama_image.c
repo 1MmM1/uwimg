@@ -408,7 +408,7 @@ image combine_images(image a, image b, matrix H)
         for(j = 0; j < a.h; ++j){
             for(i = 0; i < a.w; ++i){
                 // TODO: fill in.
-                set_pixel(c, i + dx, j + dy, k, get_pixel(a, i, j, k));
+                set_pixel(c, i - dx, j - dy, k, get_pixel(a, i, j, k));
             }
         }
     }
@@ -424,7 +424,7 @@ image combine_images(image a, image b, matrix H)
             // do we skip over pixels taken by a?
             if (projected.x >= 0 && projected.x < b.w && projected.y >= 0 && projected.y < b.h) {
                 for (k = 0; k < c.c; k++) {
-                    set_pixel(c, i + dx, j + dy, k, bilinear_interpolate(b, projected.x, projected.y, k));
+                    set_pixel(c, i - dx, j - dy, k, bilinear_interpolate(b, projected.x, projected.y, k));
                 }
             }
         }
