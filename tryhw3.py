@@ -35,6 +35,11 @@ def rainier_panorama():
     pan5 = panorama_image(pan4, im4, thresh=5)
     save_image(pan5, "rainier_panorama_5")
 
+def red_square_panorama():
+    im1 = load_image("data/redsquare1.jpg")
+    im2 = load_image("data/redsquare2.jpg")
+    pan = panorama_image(im1, im2, thresh=50)
+    save_image(pan, "redsquare_panorama")
 
 def field_panorama():
     im1 = load_image("data/field1.jpg")
@@ -70,6 +75,7 @@ def field_panorama():
 draw_corners()
 draw_matches()
 easy_panorama()
-#rainier_panorama()
+rainier_panorama()
+red_square_panorama()
 #field_panorama()
 

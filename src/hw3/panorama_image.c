@@ -483,5 +483,14 @@ image cylindrical_project(image im, float f)
 {
     //TODO: project image onto a cylinder
     image c = copy_image(im);
+    float theta, X, Y, Z;
+    for (int i = 0; i < c.w; i++) {
+        for (int j = 0; j < c.h; j++) {
+            theta = (i - c.w / 2) * 1.0 / f;
+            X = sinf(theta);
+            Y = (i - c.h / 2) * 1.0 / f;
+            Z = cosf(theta);
+        }
+    }
     return c;
 }
