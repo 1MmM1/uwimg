@@ -51,6 +51,7 @@ image make_integral_image(image im)
     for (int i = 0; i < im.w; i++) {
         for (int j = 0; j < im.h; j++) {
             for (int k = 0; k < im.c; k++) {
+                // I(x, y) = i(x, y) + I(x, y - 1) + I(x - 1, y) - I(x - 1, y - 1)
                 float sum = get_pixel(im, i, j, k);
                 if (i > 0) {
                     sum += get_pixel(integ, i - 1, j, k);
@@ -78,6 +79,27 @@ image box_filter_image(image im, int s)
     image integ = make_integral_image(im);
     image S = make_image(im.w, im.h, im.c);
     // TODO: fill in S using the integral image.
+    int x0, y0, x1, y1; // x and y coordinates of the filter
+    float A, B, C, D; // sums at the four corners
+    for (i = 0; i < im.w; i++) {
+        for (j = 0; j < im.h; j++) {
+            // i(x, y) = I(x1, y1) + I(x0, y0) - I(x1, y0) - I(x0, y1)
+            x0 = i - s / 2;
+            x1 = i + s / 2;
+            y0 = j - s / 2;
+            y1 = j + s / 2;
+            
+            for (k = 0; k < im.c; k++) {
+                // i(x, y) = D + A - B - C
+                A = get_pixel(integ, x0, y0, k);
+                B = get_pixel(integ, x1, y0, k);
+                C = get_pixel(integ, x0, y1, k);
+                D = get_pixel(integ, x1, y1, k);
+
+                set_pixel(S, i, j, k, (D + A - B - C) / (s * s));
+            }
+        }
+    }
     return S;
 }
 
