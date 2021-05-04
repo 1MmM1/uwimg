@@ -84,9 +84,9 @@ image box_filter_image(image im, int s)
     for (i = 0; i < im.w; i++) {
         for (j = 0; j < im.h; j++) {
             // i(x, y) = I(x1, y1) + I(x0, y0) - I(x1, y0) - I(x0, y1)
-            x0 = i - s / 2;
+            x0 = i - s / 2 - 1;
             x1 = i + s / 2;
-            y0 = j - s / 2;
+            y0 = j - s / 2 - 1;
             y1 = j + s / 2;
 
             // calculate total number of pixels to divide by
@@ -104,7 +104,7 @@ image box_filter_image(image im, int s)
             if (y1 >= im.h) {
                 h = im.h - y0;
             }
-            
+
             for (k = 0; k < im.c; k++) {
                 // i(x, y) = D + A - B - C
                 A = get_pixel(integ, x0, y0, k);
@@ -213,7 +213,7 @@ void constrain_image(image im, float v)
 // returns: velocity matrix
 image optical_flow_images(image im, image prev, int smooth, int stride)
 {
-    image S = time_structure_matrix(im, prev, smooth);   
+    image S = time_structure_matrix(im, prev, smooth);
     image v = velocity_image(S, stride);
     constrain_image(v, 6);
     image vs = smooth_image(v, 2);
