@@ -88,6 +88,22 @@ image box_filter_image(image im, int s)
             x1 = i + s / 2;
             y0 = j - s / 2;
             y1 = j + s / 2;
+
+            // calculate total number of pixels to divide by
+            int w = s;
+            int h = s;
+            if (x0 < 0) {
+                w = x1 + 1;
+            }
+            if (x1 >= im.w) {
+                w = im.w - x0;
+            }
+            if (y0 < 0) {
+                h = y1 + 1;
+            }
+            if (y1 >= im.h) {
+                h = im.h - y0;
+            }
             
             for (k = 0; k < im.c; k++) {
                 // i(x, y) = D + A - B - C
@@ -96,7 +112,7 @@ image box_filter_image(image im, int s)
                 C = get_pixel(integ, x0, y1, k);
                 D = get_pixel(integ, x1, y1, k);
 
-                set_pixel(S, i, j, k, (D + A - B - C) / (s * s));
+                set_pixel(S, i, j, k, (D + A - B - C) / (w * h));
             }
         }
     }
