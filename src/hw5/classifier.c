@@ -16,17 +16,24 @@ void activate_matrix(matrix m, ACTIVATION a)
             double x = m.data[i][j];
             if(a == LOGISTIC){
                 // TODO
+                m.data[i][j] = exp(x) / (1 + exp(x));
             } else if (a == RELU){
                 // TODO
+                m.data[i][j] = x > 0 ? x : 0;
             } else if (a == LRELU){
                 // TODO
+                m.data[i][j] = x > 0 ? x : 0.1 * x;
             } else if (a == SOFTMAX){
                 // TODO
+                m.data[i][j] = exp(x);
             }
             sum += m.data[i][j];
         }
         if (a == SOFTMAX) {
             // TODO: have to normalize by sum if we are using SOFTMAX
+            for(j = 0; j < m.cols; ++j){
+                m.data[i][j] = m.data[i][j] / sum;
+            }
         }
     }
 }
@@ -43,6 +50,16 @@ void gradient_matrix(matrix m, ACTIVATION a, matrix d)
         for(j = 0; j < m.cols; ++j){
             double x = m.data[i][j];
             // TODO: multiply the correct element of d by the gradient
+            if(a == LOGISTIC){
+                // TODO
+                d.data[i][j] *= x * (1 - x);
+            } else if (a == RELU){
+                // TODO
+                d.data[i][j] *= x > 0 ? 1 : 0;
+            } else if (a == LRELU){
+                // TODO
+                d.data[i][j] *= x > 0 ? 1 : 0.1;
+            }
         }
     }
 }
@@ -83,7 +100,7 @@ matrix backward_layer(layer *l, matrix delta)
     matrix dw = make_matrix(l->w.rows, l->w.cols); // replace this
     l->dw = dw;
 
-    
+
     // 1.4.3
     // TODO: finally, calculate dL/dx and return it.
     matrix dx = make_matrix(l->in.rows, l->in.cols); // replace this
@@ -242,7 +259,7 @@ void train_model(model m, data d, int batch, int iters, double rate, double mome
 }
 
 
-// Questions 
+// Questions
 //
 // 5.2.2.1 Why might we be interested in both training accuracy and testing accuracy? What do these two numbers tell us about our current model?
 // TODO
@@ -268,6 +285,3 @@ void train_model(model m, data d, int batch, int iters, double rate, double mome
 // 5.3.2.1 How well does your network perform on the CIFAR dataset?
 // TODO
 //
-
-
-
