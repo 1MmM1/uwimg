@@ -75,7 +75,8 @@ matrix forward_layer(layer *l, matrix in)
 
 
     // TODO: fix this! multiply input by weights and apply activation function.
-    matrix out = make_matrix(in.rows, l->w.cols);
+    matrix out = matrix_mult_matrix(in, l->w);
+    activate_matrix(out, l->activation);
 
 
     free_matrix(l->out);// free the old output
@@ -92,18 +93,21 @@ matrix backward_layer(layer *l, matrix delta)
     // 1.4.1
     // delta is dL/dy
     // TODO: modify it in place to be dL/d(xw)
+    gradient_matrix(l->out, l->activation, delta);
 
 
     // 1.4.2
     // TODO: then calculate dL/dw and save it in l->dw
     free_matrix(l->dw);
-    matrix dw = make_matrix(l->w.rows, l->w.cols); // replace this
+    matrix m_transpose = transpose_matrix(l->in);
+    matrix dw = matrix_mult_matrix(m_transpose, delta);
     l->dw = dw;
 
 
     // 1.4.3
     // TODO: finally, calculate dL/dx and return it.
-    matrix dx = make_matrix(l->in.rows, l->in.cols); // replace this
+    matrix w_transpose = transpose_matrix(l->w);
+    matrix dx = matrix_mult_matrix(delta, w_transpose);
 
     return dx;
 }
