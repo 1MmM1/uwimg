@@ -122,13 +122,16 @@ void update_layer(layer *l, double rate, double momentum, double decay)
     // TODO:
     // Calculate Δw_t = dL/dw_t - λw_t + mΔw_{t-1}
     // save it to l->v
-
+    matrix temp1 = axpy_matrix(-decay, l->w, l->dw);
+    matrix temp2 = axpy_matrix(momentum, l->v, temp1);
+    free_matrix(l->v);
+    l->v = temp2;
 
     // Update l->w
-
+    l->w = axpy_matrix(rate, l->v, l->w);
 
     // Remember to free any intermediate results to avoid memory leaks
-
+    free_matrix(temp1);
 }
 
 // Make a new layer for our model
