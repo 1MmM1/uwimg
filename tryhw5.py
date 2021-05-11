@@ -28,6 +28,13 @@ train_model(m, train, batch, iters, rate, momentum, decay)
 print("done")
 print
 
+print("Model parameters:")
+print("batch size:", batch)
+print("epochs:", iters)
+print("learning rate:", rate)
+print("momentum:", momentum)
+print("weight decay lambda:", decay)
+
 print("evaluating model...")
 print("training accuracy: %f", accuracy_model(m, train))
 print("test accuracy:     %f", accuracy_model(m, test))
