@@ -272,24 +272,69 @@ void train_model(model m, data d, int batch, int iters, double rate, double mome
 // Questions
 //
 // 5.2.2.1 Why might we be interested in both training accuracy and testing accuracy? What do these two numbers tell us about our current model?
-// TODO
+// Training accuracy tells us how well our model fits and can predict the data it was trained on and testing accuracy telss us how well our model fits and 
+// can predict the data in our test set, which it was not trained on (how well it may generalize to unseen data). We got a training accuracy of 90.388% 
+// and test accuracy of 91.03%. Since our test accuracy is higher than our training, it tells us that our model will likely generalize well to unseen data.
+// Both train and test accuracies are high, which means that our model performs rather well on MNIST data.
 //
-// 5.2.2.2 Try varying the model parameter for learning rate to different powers of 10 (i.e. 10^1, 10^0, 10^-1, 10^-2, 10^-3) and training the model. What patterns do you see and how does the choice of learning rate affect both the loss during training and the final model accuracy?
-// TODO
+// 5.2.2.2 Try varying the model parameter for learning rate to different powers of 10 (i.e. 10^1, 10^0, 10^-1, 10^-2, 10^-3) and training the model. What 
+// patterns do you see and how does the choice of learning rate affect both the loss during training and the final model accuracy?
+// For the following trials we used the default weight decay of 0, momentum of 0.9, batch size of 128, and iteration number of 1000.
+// 10^1: loss became -nan really quickly (around iteration 3). Training and test accuracy were both around 9.8%
+// 10^0: loss fluctuated throughout training between a little over 1 and 0.3. Training and test accuracy were both around 89% (89.34% and 89.33% respectively)
+// 10^-1: loss consistently decreased throughout training. Training and test accuracy were both around 92% (91.93% and 91.82% respectively)
+// 10^-2: loss consistently decreased throughout training. Training and test accuracy were both around 91% (90.38% and 91.03% respectively)
+// 10^-3: loss consistently decreased throughout training. Training accuracy was 85.79% and test accuracy was 86.67%.
+// Learning rates greater than one seems to cause the loss to fluctuate greatly during training, and learning rates which were too high (>= 10) caused the model to 
+// not learn. Learning rates smaller than 10^-3 seem to learn too slowly so it doesn't reach the same degree of accuracy in the same number of iterations. The 
+// 10^-1 and 10^-2 learning rates gave us the highest model accuracy and most stable loss progression during training.
 //
-// 5.2.2.3 Try varying the parameter for weight decay to different powers of 10: (10^0, 10^-1, 10^-2, 10^-3, 10^-4, 10^-5). How does weight decay affect the final model training and test accuracy?
-// TODO
+// 5.2.2.3 Try varying the parameter for weight decay to different powers of 10: (10^0, 10^-1, 10^-2, 10^-3, 10^-4, 10^-5). How does weight decay affect the 
+// final model training and test accuracy?
+// For the following trials we used the default learning rate of 0.01, momentum of 0.9, batch size of 128, and iteration number of 1000.
+// 10^0: Training accuracy was 89% and test accuracy was 90%
+// 10^-1: Training accuracy was 90.27% and test accuracy was slightly higher at 90.88%
+// 10^-2: Training accuracy was 90.32% and test accuracy was slightly higher at 90.91%
+// 10^-3: Training accuracy was 90.33% and test accuracy was slightly higher at 90.93%
+// 10^-4: Training accuracy was 90.33% and test accuracy was slightly higher at 90.93% (same as 10^-3)
+// 10^-5: Training accuracy was 90.33% and test accuracy was slightly higher at 90.93% (same as 10^-4)
+// It seems like weight decay only affects the model training and test accuracy up to a certain point - in our case, any weight decay smaller than 10^-3
+// produced the same training and test accuracy.
 //
-// 5.2.3.1 Currently the model uses a logistic activation for the first layer. Try using a the different activation functions we programmed. How well do they perform? What's best?
-// TODO
+// 5.2.3.1 Currently the model uses a logistic activation for the first layer. Try using a the different activation functions we programmed. How well do they 
+// perform? What's best?
+// For the following trials we used the default learning rate of 0.01, weight decay of 0, momentum of 0.9, batch size of 128, and iteration number of 1000.
+// Linear: Training accuracy was 91.39% and test accuracy was 91.63%
+// Softmax: Training accuracy was 59.42% and test accuracy was 59.82%
+// Logistic: Training accuracy was 88.71% and test accuracy was 89.22%
+// ReLU: Training accuracy was 92.57% and test accuracy was 92.64%
+// Leaky ReLU: Training accuracy was 92.13% and test accuracy was 92.3%
+// The best activation function seems to be ReLu since the test accuracy was the highest.
 //
 // 5.2.3.2 Using the same activation, find the best (power of 10) learning rate for your model. What is the training accuracy and testing accuracy?
-// TODO
+// For the following trials we used the default weight decay of 0, momentum of 0.9, batch size of 128, and iteration number of 1000.
+// 10^1: Training accuracy was 9.87% and test accuracy was 9.8%
+// 10^0: Training accuracy was 19.83% and test accuracy was 19.89%
+// 10^-1: Training accuracy was 96.14% and test accuracy was 95.44%
+// 10^-2: Training accuracy was 92.57% and test accuracy was 92.64%
+// 10^-3: Training accuracy was 86.32% and test accuracy was 86.80%
+// We used ReLU for our activation fuction following our results from question 5.2.3.1. From these trials, we found that using a learning rate of 0.1 produced
+// the best training and test accuracies than the other learning rates.
 //
 // 5.2.3.3 Right now the regularization parameter `decay` is set to 0. Try adding some decay to your model. What happens, does it help? Why or why not may this be?
-// TODO
+// For the following trials we used the default learning rate of 0.01, momentum of 0.9, batch size of 128, and iteration number of 1000.
+// 0: Training accuracy was 88.63% and test accuracy was 89.23%
+// 10^0: Training accuracy was 87.24% and test accuracy was 87.85%
+// 10^-1: Training accuracy was 88.53% and test accuracy was 89.08%
+// 10^-2: Training accuracy was 88.61% and test accuracy was 89.21%
+// 10^-3: Training accuracy was 88.63% and test accuracy was 89.23% 
+// 10^-4: Training accuracy was 88.63% and test accuracy was 89.23% (same as 10^-3)
+// 10^-5: Training accuracy was 88.63% and test accuracy was 89.23% (same as 10^-4)
+// We used ReLU for our activation fuction following our results from question 5.2.3.1. Based on our tests, it doesn't seem like adding weight decay improved our 
+// accuracy at all; without weight decay our test accuracy was 89.23% and with weight decay our best test accuracy was 89.23%. This might be because ???
 //
-// 5.2.3.4 Modify your model so it has 3 layers instead of two. The layers should be `inputs -> 64`, `64 -> 32`, and `32 -> outputs`. Also modify your model to train for 3000 iterations instead of 1000. Look at the training and testing error for different values of decay (powers of 10, 10^-4 -> 10^0). Which is best? Why?
+// 5.2.3.4 Modify your model so it has 3 layers instead of two. The layers should be `inputs -> 64`, `64 -> 32`, and `32 -> outputs`. Also modify your model to train 
+// for 3000 iterations instead of 1000. Look at the training and testing error for different values of decay (powers of 10, 10^-4 -> 10^0). Which is best? Why?
 // TODO
 //
 // 5.3.2.1 How well does your network perform on the CIFAR dataset?
