@@ -32,7 +32,7 @@ void activate_matrix(matrix m, ACTIVATION a)
         if (a == SOFTMAX) {
             // TODO: have to normalize by sum if we are using SOFTMAX
             for(j = 0; j < m.cols; ++j){
-                m.data[i][j] = m.data[i][j] / sum;
+                m.data[i][j] /= sum;
             }
         }
     }
@@ -233,7 +233,7 @@ double cross_entropy_loss(matrix y, matrix p)
 {
     int i, j;
     double sum = 0;
-    for(i = 0; i < y.rows; ++i){
+    for(i = 0; i < y.rows; ++i){ // y.rows = 128
         for(j = 0; j < y.cols; ++j){
             sum += -y.data[i][j]*log(p.data[i][j]);
         }
@@ -254,7 +254,7 @@ void train_model(model m, data d, int batch, int iters, double rate, double mome
 {
     int e;
     for(e = 0; e < iters; ++e){
-        data b = random_batch(d, batch);
+        data b = random_batch(d, batch); // X: [128,785]  y: [128,10]
         matrix p = forward_model(m, b.X);
         fprintf(stderr, "%06d: Loss: %f\n", e, cross_entropy_loss(b.y, p));
         matrix dL = axpy_matrix(-1, p, b.y); // partial derivative of loss dL/dy
