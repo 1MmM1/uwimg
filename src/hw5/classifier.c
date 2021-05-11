@@ -102,13 +102,14 @@ matrix backward_layer(layer *l, matrix delta)
     matrix m_transpose = transpose_matrix(l->in);
     matrix dw = matrix_mult_matrix(m_transpose, delta);
     l->dw = dw;
-
+    free_matrix(m_transpose);
 
     // 1.4.3
     // TODO: finally, calculate dL/dx and return it.
     matrix w_transpose = transpose_matrix(l->w);
     matrix dx = matrix_mult_matrix(delta, w_transpose);
-
+    free_matrix(w_transpose);
+    
     return dx;
 }
 
@@ -128,7 +129,9 @@ void update_layer(layer *l, double rate, double momentum, double decay)
     l->v = temp2;
 
     // Update l->w
-    l->w = axpy_matrix(rate, l->v, l->w);
+    matrix temp3 = axpy_matrix(rate, l->v, l->w);
+    free_matrix(l->w);
+    l->w = temp3;
 
     // Remember to free any intermediate results to avoid memory leaks
     free_matrix(temp1);
