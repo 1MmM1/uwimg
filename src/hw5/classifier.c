@@ -15,22 +15,18 @@ void activate_matrix(matrix m, ACTIVATION a)
         for(j = 0; j < m.cols; ++j){
             double x = m.data[i][j];
             if(a == LOGISTIC){
-                // TODO
                 m.data[i][j] = exp(x) / (1 + exp(x));
             } else if (a == RELU){
-                // TODO
                 m.data[i][j] = x > 0 ? x : 0;
             } else if (a == LRELU){
-                // TODO
                 m.data[i][j] = x > 0 ? x : 0.1 * x;
             } else if (a == SOFTMAX){
-                // TODO
                 m.data[i][j] = exp(x);
             }
             sum += m.data[i][j];
         }
         if (a == SOFTMAX) {
-            // TODO: have to normalize by sum if we are using SOFTMAX
+            // normalize by sum if we are using SOFTMAX
             for(j = 0; j < m.cols; ++j){
                 m.data[i][j] /= sum;
             }
@@ -49,15 +45,12 @@ void gradient_matrix(matrix m, ACTIVATION a, matrix d)
     for(i = 0; i < m.rows; ++i){
         for(j = 0; j < m.cols; ++j){
             double x = m.data[i][j];
-            // TODO: multiply the correct element of d by the gradient
+            // multiply the correct element of d by the gradient
             if(a == LOGISTIC){
-                // TODO
                 d.data[i][j] *= x * (1 - x);
             } else if (a == RELU){
-                // TODO
                 d.data[i][j] *= x > 0 ? 1 : 0;
             } else if (a == LRELU){
-                // TODO
                 d.data[i][j] *= x > 0 ? 1 : 0.1;
             }
         }
@@ -74,7 +67,7 @@ matrix forward_layer(layer *l, matrix in)
     l->in = in;  // Save the input for backpropagation
 
 
-    // TODO: fix this! multiply input by weights and apply activation function.
+    // multiply input by weights and apply activation function.
     matrix out = matrix_mult_matrix(in, l->w);
     activate_matrix(out, l->activation);
 
@@ -92,12 +85,12 @@ matrix backward_layer(layer *l, matrix delta)
 {
     // 1.4.1
     // delta is dL/dy
-    // TODO: modify it in place to be dL/d(xw)
+    // modify it in place to be dL/d(xw)
     gradient_matrix(l->out, l->activation, delta);
 
 
     // 1.4.2
-    // TODO: then calculate dL/dw and save it in l->dw
+    // then calculate dL/dw and save it in l->dw
     free_matrix(l->dw);
     matrix m_transpose = transpose_matrix(l->in);
     matrix dw = matrix_mult_matrix(m_transpose, delta);
@@ -105,7 +98,7 @@ matrix backward_layer(layer *l, matrix delta)
     free_matrix(m_transpose);
 
     // 1.4.3
-    // TODO: finally, calculate dL/dx and return it.
+    // finally, calculate dL/dx and return it.
     matrix w_transpose = transpose_matrix(l->w);
     matrix dx = matrix_mult_matrix(delta, w_transpose);
     free_matrix(w_transpose);
@@ -330,13 +323,26 @@ void train_model(model m, data d, int batch, int iters, double rate, double mome
 // 10^-3: Training accuracy was 88.63% and test accuracy was 89.23% 
 // 10^-4: Training accuracy was 88.63% and test accuracy was 89.23% (same as 10^-3)
 // 10^-5: Training accuracy was 88.63% and test accuracy was 89.23% (same as 10^-4)
-// We used ReLU for our activation fuction following our results from question 5.2.3.1. Based on our tests, it doesn't seem like adding weight decay improved our 
-// accuracy at all; without weight decay our test accuracy was 89.23% and with weight decay our best test accuracy was 89.23%. This might be because ???
+// We used ReLU for our activation function following our results from question 5.2.3.1. Based on our tests, it doesn't seem like adding weight decay improved our 
+// accuracy at all; with or without weight decay, our test accuracy was 89.23%. This might be because our model was already not overfitting, so adding the regularization
+// term did not increase the accuracy.
 //
 // 5.2.3.4 Modify your model so it has 3 layers instead of two. The layers should be `inputs -> 64`, `64 -> 32`, and `32 -> outputs`. Also modify your model to train 
 // for 3000 iterations instead of 1000. Look at the training and testing error for different values of decay (powers of 10, 10^-4 -> 10^0). Which is best? Why?
-// TODO
+// 10^0: Training accuracy was 94.27% and test accuracy was 94.33%
+// 0.0: Training accuracy was 96.98% and test accuracy was 96.51%
+// 10^-1: Training accuracy was 96.72% and test accuracy was 96.45%
+// 10^-2: Training accuracy was 96.96% and test accuracy was 96.57%
+// 10^-3: Training accuracy was 96.96% and test accuracy was 96.53%
+// 10^-4: Training accuracy was 96.54% and test accuracy was 96.54%
+// We used a default learning rate of 0.01, momentum of 0.9, batch size of 128, and iteration number of 3000.
+// Using a network with three layers (RELU -> RELU -> SOFTMAX), we found that a weight decay of 10^-2 resulted in the lowest testing error, but 
+// only by a slim margin. The accuracy seems to plateau between 10^-1 and 10^-4, which suggests that our model was probably already not overfitting 
+// too much, so a larger weight decay (10^0) added too much regularization and increased the bias so that it did not fit the data as well as it should. 
+// Smaller weight decay values did not affect the accuracy a lot, but we saw that test accuracy was slightly higher with regularization than without, 
+// indicating it did help reduce the small amount of overfitting in the model.
 //
 // 5.3.2.1 How well does your network perform on the CIFAR dataset?
-// TODO
+// We used a default learning rate of 0.01, momentum of 0.9, weight decay of 0, batch size of 128, and iteration number of 3000.
+// With a three-layer network (RELU -> RELU -> SOFTMAX), we achieved a training accuracy of 48.31% and a test accuracy of 46.52.
 //
